@@ -7,6 +7,8 @@ package co.edu.udea.appempresariales.dojo.directorio.ws;
 
 import co.edu.udea.appempresariales.dojo.directorio.beans.ContactoFacade;
 import co.edu.udea.appempresariales.dojo.directorio.entities.Contacto;
+import com.google.gson.Gson;
+import java.lang.reflect.Type;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -14,7 +16,6 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -35,15 +36,18 @@ public class ContactWebService {
     @Path("/obtenertodos")
     @Produces(MediaType.APPLICATION_JSON)
     @GET
-    public List<Contacto> getAllContacts() {
-        return contactoFacade.findAll();
+    public String getAllContacts() {
+        return new Gson().toJson(contactoFacade.findAll());
     }
 
     @Path("/guardarcontacto")
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
-    public Response guardarContacto(Contacto contacto) throws WebApplicationException {
-
+    public Response guardarContacto(String contact) throws WebApplicationException {
+        Contacto contacto =null;
+        Gson g =new Gson();
+        System.out.println(contact);
+        contacto=g.fromJson(contact,  Contacto.class);
         if (contacto.getTelefono() == null || contacto.getNombre() == null || contacto.getApellido() == null) {
             throw new WebApplicationException("Ingrese todos los datos del contacto",
                     Response.status(Response.Status.BAD_REQUEST)
